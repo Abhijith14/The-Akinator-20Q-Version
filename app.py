@@ -2,7 +2,7 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 
-from config import API_KEY as candidate_api_key, PROXY_URL as llm_proxy_url
+from config import API_KEY as candidate_api_key, PROXY_URL as llm_proxy_url, Question_limit as question_limit
 
 app = Flask(__name__)
 
@@ -20,7 +20,7 @@ data = {
     "messages": [
         {
             "role": "user", 
-            "content": "Let's play a guessing game. I will think of an object and you have to guess what it is by asking yes or no questions. You only get 5 questions total. Please ask one question at a time and wait for my response of 'yes' or 'no' before asking the next question. If you do not guess correctly in 5 or fewer questions, you should apologize for losing the game and ask if I would like to play again with a new object. You will start the game by asking your first yes or no question to narrow down what I am thinking of. Begin when ready."
+            "content": "Let's play a guessing game. I will think of an object and you have to guess what it is by asking yes or no questions. You only get {0} questions total. Please ask one question at a time and wait for my response of 'yes' or 'no' before asking the next question. If you do not guess correctly in {0} or fewer questions, you should apologize for losing the game and ask if I would like to play again with a new object. You will start the game by asking your first yes or no question to narrow down what I am thinking of. Begin when ready.".format(question_limit)
         }
     ]
 }
@@ -43,7 +43,7 @@ def get_question():
 
     question = request.json.get("question", "")
 
-    if question_count <= 5:
+    if question_count <= question_limit:
         answer = get_llm_answer(question, question_count)
         return jsonify({"question": str(answer), "reset": False})
     
