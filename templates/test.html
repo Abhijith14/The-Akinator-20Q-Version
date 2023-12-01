@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Input</title>
+
+    <!-- Add this to the head section of your HTML -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+</head>
+<body>
+    <h1>Enter a Question</h1>
+        <label for="question">Question:</label>
+        <input type="text" id="question" name="question" required>
+        <button type="button" onclick="askQuestion()">Ask Question</button>
+
+    <button value="Reset" onclick="resetGame()">Reset</button>
+    
+    <div id="response"></div>
+
+   <script>
+    function askQuestion() {
+        var question = document.getElementById('question').value;
+
+        // Send a POST request to the Flask server using AJAX
+        $.ajax({
+            type: 'POST',
+            url: '/ask_question',
+            contentType: 'application/json',
+            data: JSON.stringify({ question: question }),
+            success: function(data) {
+                document.getElementById('response').innerText = 'Response: ' + data.question;
+            },
+            error: function(error) {
+                console.error('AJAX error:', error);
+            }
+        });
+    }
+
+    function resetGame() {
+        // Send a POST request to the Flask server using AJAX
+        $.ajax({
+            type: 'POST',
+            url: '/reset_question_limit',
+            contentType: 'application/json',
+            success: function(data) {
+                document.getElementById('response').innerText = 'Response: ' + data.question;
+            },
+            error: function(error) {
+                console.error('AJAX error:', error);
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
