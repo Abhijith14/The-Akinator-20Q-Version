@@ -80,7 +80,7 @@ def reset():
         "messages": [
             {
                 "role": "user", 
-                "content": "Let's play a guessing game. I will think of an object and you have to guess what it is by asking yes or no questions. You only get 5 questions total. Please ask one question at a time and wait for my response of 'yes' or 'no' before asking the next question. If you do not guess correctly in 5 or fewer questions, you should apologize for losing the game and ask if I would like to play again with a new object. You will start the game by asking your first yes or no question to narrow down what I am thinking of. Begin when ready."
+                "content": "Let's play a guessing game. I will think of an object and you have to guess what it is by asking yes or no questions. You only get {0} questions total. Please ask one question at a time and wait for my response of 'yes' or 'no' before asking the next question. If you do not guess correctly in {0} or fewer questions, you should apologize for losing the game and ask if I would like to play again with a new object. You will start the game by asking your first yes or no question to narrow down what I am thinking of. Begin when ready.".format(question_limit)
             }
         ]
     }
