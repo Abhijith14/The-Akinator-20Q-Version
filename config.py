@@ -1,4 +1,4 @@
-API_KEY = "YOUR API KEY"
+API_KEY = "YOUR API KEY HERE"
 PROXY_URL = "https://candidate-llm.extraction.artificialos.com/v1/chat/completions"
 
-question_limit = 20
+Question_limit = 20
