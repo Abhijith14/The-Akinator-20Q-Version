@@ -7,7 +7,7 @@ from config import API_KEY as candidate_api_key, PROXY_URL as llm_proxy_url
 app = Flask(__name__)
 
 
-question_limit = 0
+question_count = 0
 
 # Set headers with the x-api-key
 headers = {
@@ -16,47 +16,54 @@ headers = {
 
 
 data = {
-    "model" : "gpt-3.5-turbo",
-    "messages": [{"role": "user", "content": "Ask yes/no question to guess whats in my mind. You can only ask 5 questions. Ask one by one to try to guess it in less than 5 questions. If you cross 5 questions, you lose. Apologise when you lose."}]
+    "model": "gpt-3.5-turbo",
+    "messages": [
+        {
+            "role": "user", 
+            "content": "Let's play a guessing game. I will think of an object and you have to guess what it is by asking yes or no questions. You only get 5 questions total. Please ask one question at a time and wait for my response of 'yes' or 'no' before asking the next question. If you do not guess correctly in 5 or fewer questions, you should apologize for losing the game and ask if I would like to play again with a new object. You will start the game by asking your first yes or no question to narrow down what I am thinking of. Begin when ready."
+        }
+    ]
 }
-
-
 
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/ask_question', methods=['POST'])
-def ask_question():
-    global question_limit
 
-    question = request.json.get("question")
-    question_limit += 1
+@app.route('/game')
+def start_game():
+    return render_template('game.html')
 
 
-    if question_limit <= 30:
-        # return jsonify({"question": question})
-        answer = get_llm_answer(question, question_limit)
+@app.route('/get_question', methods=['POST'])
+def get_question():
+    global question_count
+    question_count += 1
 
-        return jsonify({"question": str(answer)})
+    question = request.json.get("question", "")
+
+    if question_count <= 5:
+        answer = get_llm_answer(question, question_count)
+        return jsonify({"question": str(answer), "reset": False})
     
     else:
-        return jsonify({"question": "You have reached the limit of questions"})
+        question_count = 0
+        reset()
+        return jsonify({"question": "Game ended.", "reset": True})
 
 
 
 # get the answer from the LLM
-def get_llm_answer(question, question_limit):
-    if question_limit == 1:
+def get_llm_answer(question, question_count):
+    global data, headers
+    if question_count == 1:
         response = requests.post(llm_proxy_url, json=data, headers=headers)
-        response_json = response.json()
         answer = response.json()["choices"][0]['message']['content']
         data["messages"].append({"role": "assistant", "content": answer})
     else:
         data["messages"].append({"role": "user", "content": question})
         response = requests.post(llm_proxy_url, json=data, headers=headers)
-        response_json = response.json()
         answer = response.json()["choices"][0]['message']['content']
         data["messages"].append({"role": "assistant", "content": answer})
 
@@ -65,13 +72,19 @@ def get_llm_answer(question, question_limit):
 
 
 # reset the question limit
-@app.route('/reset_question_limit', methods=['POST'])
-def reset_question_limit():
-    global question_limit
-    question_limit = 0
-    return jsonify({"question": "You have reset the question limit"})
-
-
+def reset():
+    global question_count, data
+    question_count = 0
+    data = {
+        "model": "gpt-3.5-turbo",
+        "messages": [
+            {
+                "role": "user", 
+                "content": "Let's play a guessing game. I will think of an object and you have to guess what it is by asking yes or no questions. You only get 5 questions total. Please ask one question at a time and wait for my response of 'yes' or 'no' before asking the next question. If you do not guess correctly in 5 or fewer questions, you should apologize for losing the game and ask if I would like to play again with a new object. You will start the game by asking your first yes or no question to narrow down what I am thinking of. Begin when ready."
+            }
+        ]
+    }
+    
 
 if __name__ == '__main__':
     app.run(debug=True)

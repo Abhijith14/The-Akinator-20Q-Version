@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Center</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            
+            overflow: hidden;
+
+            background-image: url("static/images/bg.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .mainBox {
+            width: 540px;
+            height: 540px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+
+
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <img src="static/images/hello1.png" alt="logo" width=540>
+
+        <div class="mainBox">
+            <h1>The Akinator : 20Q Version</h1>
+            <button onclick="location.href='/game'">Start Game</button>
+        </div>
+    </div>
+</body>
+</html>

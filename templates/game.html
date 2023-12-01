@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Center</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            
+            overflow: hidden;
+
+            background-image: url("static/images/bg.jpg");
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .mainBox {
+            width: 540px;
+            height: 540px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mainBox > h1 {
+            font-size: 30px;
+            font-weight: 500;
+            text-align: center;
+            margin: 0px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <img src="static/images/hello1.png" alt="logo" width=540>
+
+        <div class="mainBox">
+            <h1 id="question">Loading question...</h1><br>
+            <!-- yes or no radio buttons -->
+            <div>
+                <button id="yesbtn" onclick="submitSolution(this)">Yes</button>
+                <button id="noBtn" onclick="submitSolution(this)">No</button>
+                <button id="resetBtn" onclick="location.href='/'">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        $(document).ready(function() {
+            // hide reset button
+            document.getElementById('resetBtn').style.display = 'none';
+            // Send a POST request to the Flask server using AJAX
+            $.ajax({
+                type: 'POST',
+                url: '/get_question',
+                contentType: 'application/json',
+                data: JSON.stringify({}),
+                success: function(data) {
+                    document.getElementById('question').innerText = data.question;
+                },
+                error: function(error) {
+                    console.error('AJAX error:', error);
+                }
+            });
+        });
+
+        function submitSolution(button) {
+            var answer = button.innerHTML;
+
+            // replace the question with a loading message
+            document.getElementById('question').innerText = 'Loading question...';
+            
+            // Send a POST request to the Flask server using AJAX
+            $.ajax({
+                type: 'POST',
+                url: '/get_question',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    question : answer
+                }),
+                success: function(data) {
+                    document.getElementById('question').innerText = data.question;
+                    if (data.reset == true) {
+                        // alert('You have been reset!');
+                        // location.href = '/';
+                        // hide yes and no buttons
+                        document.getElementById('yesbtn').style.display = 'none';
+                        document.getElementById('noBtn').style.display = 'none';
+                        document.getElementById('resetBtn').style.display = 'block';
+
+                    }
+                },
+                error: function(error) {
+                    console.error('AJAX error:', error);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
